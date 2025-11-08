@@ -1,82 +1,142 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <head>
     <meta charset="utf-8">
-    <title>Book Reservation - Welcome and choose a Book</title>
-    <style type="text/css">
+    <title>Book Reservation</title>
+    <style>
         body {
-            width: 800px;
-            margin: auto;
-            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8f9fa;
         }
-        h1 {
-            color: #333;
-            text-align: center;
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        .top-actions { text-align: right; margin-bottom: 20px; }
+        .top-actions a { background-color: #007bff; color: white; text-decoration: none; padding: 8px 14px; border-radius: 5px; }
+        .top-actions a:hover { background-color: #0056b3; }
+        .book-list { margin-bottom: 25px; }
+        .book-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        form {
-            margin-top: 20px;
+        .book-info { flex: 1; }
+        .book-info label { cursor: pointer; }
+        .book-actions { margin-left: 15px; white-space: nowrap; }
+        .book-actions .edit, .book-actions button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-left: 3px;
         }
-        .book-option {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .book-actions a:hover { background-color: #5a6268; }
+        .book-actions .delete {
+            background-color: #dc3545;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
         }
-        .book-option:hover {
-            background-color: #f5f5f5;
+        .search {
+            margin-top: 5px;
+            background-color: #008ffd;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
         }
-        .search-bar {
-            margin-bottom: 30px;
-            padding: 10px;
-            border: 1px solid #ccc;
+        .book-actions button:hover { background-color: #c82333; }
+        form.reserve-form {
+            background-color: white;
+            padding: 20px;
             border-radius: 10px;
-            background-color: #fafafa;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .search-bar input {
-            margin-right: 10px;
-            padding: 5px;
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
         }
+        input[type="submit"] {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover { background-color: #218838; }
     </style>
 </head>
 <body>
 <header>
-    <h1>Welcome to our Book Reservation App</h1>
+    <h1>Book Reservation App</h1>
 </header>
 
+<div class="top-actions">
+    <a href="/books/book-form">Add New Book</a>
+</div>
+
 <main>
+    <form th:action="@{/books}" method="get" style="margin-bottom: 20px;">
+        <input type="text" name="searchText" placeholder="Search by title"
+               th:value="${param.searchText}" />
+        <input type="number" name="minRating" placeholder="Minimum rating" step="0.1" min="0"
+               th:value="${param.minRating}" />
+        <button class="search" type="submit">Search</button>
+        <a th:href="@{/books}">Clear</a>
+    </form>
 
-    <div class="search-bar">
-        <form method="get" action="/">
-            <label>Search by title:</label>
-            <input type="text" name="title" placeholder="Enter text..." />
+    <form class="reserve-form" action="/bookReservation" method="post">
+        <h2>Select a Book to Reserve</h2>
 
-            <input type="number" name="rating" min="0" max="5" step="0.1" placeholder="Enter rating..."/>
-
-            <button type="submit">Search</button>
-            <a href="/">Reset</a>
-        </form>
-    </div>
-
-    <form action="/bookReservation" method="POST">
-        <h2>Choose a book:</h2>
-        <div th:each="book : ${books}" class="book-option">
-            <label>
-                <input type="radio" name="bookTitle" th:value="${book.title}" required/>
-                <span th:text="'Title: ' + ${book.title} + ', Genre: ' + ${book.genre} + ', Rating: ' + ${book.averageRating}"></span>
-            </label>
+        <div class="book-list" th:each="book : ${books}">
+            <div class="book-item">
+                <div class="book-info">
+                    <label>
+                        <input type="radio" name="bookId" th:value="${book.id}" required>
+                        <span th:text="'Title: ' + ${book.title} + ' | Genre: ' + ${book.genre} + ' | Rating: ' + ${book.averageRating} + ' | Author: ' + ${book.author.name + ' ' + book.author.surname}"></span>
+                    </label>
+                </div>
+                <div class="book-actions">
+                    <a class="edit" th:href="@{'/books/book-form/' + ${book.id}}">Edit</a>
+                    <a class="delete" th:href="@{'/books/delete/' + ${book.id}}" onclick="return confirm('Are you sure?');">Delete</a>
+                </div>
+            </div>
         </div>
 
-        <h2>Enter your information:</h2>
         <label>Your Name:</label>
-        <input type="text" name="readerName" required><br/>
-        <label>Your Address:</label>
-        <input type="text" name="readerAddress" required><br/>
+        <input type="text" name="readerName" required>
 
-        <h2>Choose number of copies:</h2>
-        <input type="number" name="numCopies" min="1" max="10" required><br/><br/>
+        <label>Your Address:</label>
+        <input type="text" name="readerAddress" required>
+
+        <label>Number of Copies:</label>
+        <input type="number" name="numCopies" min="1" max="10" required>
 
         <input type="submit" value="Reserve Book">
     </form>
+
+
 </main>
+
 </body>
 </html>

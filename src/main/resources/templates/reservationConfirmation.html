@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
 <head>
     <meta charset="utf-8">
     <title>Book Reservation - Confirmation</title>
-    <style type="text/css">
+    <style>
         body {
             width: 800px;
             margin: auto;
@@ -48,7 +48,7 @@
         </tr>
         <tr>
             <td><b>Client IP Address</b></td>
-            <td th:text="${ipAddress}"><!-- Display IP address from servlet --></td>
+            <td th:text="${reservation.getClientIp()}"><!-- Display IP address from servlet --></td>
         </tr>
         <tr>
             <td><b>Reservation for Book</b></td>

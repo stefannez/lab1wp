@@ -10,4 +10,6 @@ public class BookReservation {
     private String readerName;
     private String readerAddress;
     private Long numberOfCopies;
+    private String clientIp;
+
 }
