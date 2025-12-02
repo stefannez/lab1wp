@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en-us" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>Book Reservation - Confirmation</title>
-    <style>
+    <style type="text/css">
         body {
             width: 800px;
             margin: auto;
@@ -43,20 +43,20 @@
             <th colspan="2">Your Reservation Status</th>
         </tr>
         <tr>
-            <td><b>Reader Name</b></td>
-            <td th:text="${reservation.getReaderName()}"><!-- Display reader name from servlet --></td>
+            <td><b>User Name</b></td>
+            <td th:text="${reservation.getUsername()}">Username from JPA</td>
         </tr>
         <tr>
-            <td><b>Client IP Address</b></td>
-            <td th:text="${reservation.getClientIp()}"><!-- Display IP address from servlet --></td>
+            <td><b>Reservation Time</b></td>
+            <td th:text="${#temporals.format(reservation.getReservationTime(), 'dd-MM-yyyy HH:mm')}">Reservation Time</td>
         </tr>
         <tr>
             <td><b>Reservation for Book</b></td>
-            <td th:text="${reservation.getBookTitle()}"><!-- Display book title from servlet --></td>
+            <td th:text="${reservation.getBook().getTitle()}">Book Title</td>
         </tr>
         <tr>
-            <td><b>Number of copies</b></td>
-            <td th:text="${reservation.getNumberOfCopies()}"><!-- Display number of copies from servlet --></td>
+            <td><b>Reservation ID</b></td>
+            <td th:text="${reservation.getId()}">Reservation ID</td>
         </tr>
     </table>
 </section>

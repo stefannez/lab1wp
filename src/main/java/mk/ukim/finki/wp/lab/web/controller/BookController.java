@@ -31,7 +31,6 @@ public class BookController {
             Model model) {
 
         List<Book> books;
-
         if ((searchText != null && !searchText.isEmpty()) || minRating != null) {
             books = bookService.searchBooks(searchText, minRating);
         } else {
@@ -40,10 +39,9 @@ public class BookController {
 
         model.addAttribute("books", books);
         model.addAttribute("authors", authorService.findAll());
-
-        if (error != null) {
-            model.addAttribute("error", error);
-        }
+        model.addAttribute("searchText", searchText);
+        model.addAttribute("minRating", minRating);
+        if (error != null) model.addAttribute("error", error);
 
         // За да се задржат вредностите во формата после пребарување
         model.addAttribute("searchText", searchText);
@@ -73,24 +71,33 @@ public class BookController {
     }
 
     // 4.2 Add new book - POST /books/add
+    // BookController.java
     @PostMapping("/add")
     public String saveBook(@RequestParam String title,
                            @RequestParam String genre,
                            @RequestParam Double averageRating,
                            @RequestParam Long authorId) {
-        Author author = authorService.findById(authorId);
+        // 1. Најди го Авторот од база
+        Author author = authorService.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        // 2. Зачувај ја книгата во база
         bookService.save(title, genre, averageRating, author);
         return "redirect:/books";
     }
 
     // 4.3 Edit book - POST /books/edit/{bookId}
     @PostMapping("/edit/{bookId}")
-    public String editBook(@PathVariable Long bookId,
-                           @RequestParam String title,
-                           @RequestParam String genre,
-                           @RequestParam Double averageRating,
-                           @RequestParam Long authorId) {
-        Author author = authorService.findById(authorId);
+    public String editBook(
+            @PathVariable Long bookId,
+            @RequestParam String title,
+            @RequestParam String genre,
+            @RequestParam Double averageRating,
+            @RequestParam Long authorId
+    ) {
+        Author author = authorService.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("Author not found with ID: " + authorId));
+
         bookService.update(bookId, title, genre, averageRating, author);
         return "redirect:/books";
     }

@@ -23,21 +23,26 @@ public class BookReservationController {
 
     @PostMapping("/bookReservation")
     public String reserveBook(
+            // 💡 Ги задржуваме само bookId и readerName/username
+            // Ги отстрануваме readerAddress, numCopies, clientIp (освен ако не се користат на друго место)
             @RequestParam String readerName,
-            @RequestParam String readerAddress,
-            @RequestParam Long numCopies,
             @RequestParam Long bookId,
-            HttpServletRequest request,
             Model model) {
 
+        // 1. Податоците за книгата се потребни само за приказ или проверка,
+        // но не се потребни за повикот на placeReservation, бидејќи сервисот ја наоѓа книгата по ID.
         Book selectedBook = bookService.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
 
-        String clientIp = request.getRemoteAddr();
-
-        BookReservation reservation = bookReservationService.placeReservation(selectedBook.getTitle(), readerName, readerAddress, numCopies, clientIp);
+        // 2. 💡 КОРЕКЦИЈА: Повикување на JPA сервисот со ID и username
+        BookReservation reservation = bookReservationService.placeReservation(
+                bookId,
+                readerName // Го користиме readerName како username
+        );
 
         model.addAttribute("reservation", reservation);
+        // Можеби ќе треба да го додадеш и selectedBook ако reservationConfirmation.html го бара
+        model.addAttribute("book", selectedBook);
 
         return "reservationConfirmation";
     }
